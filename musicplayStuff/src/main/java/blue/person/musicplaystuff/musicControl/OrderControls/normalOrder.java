@@ -1,7 +1,8 @@
-package blue.person.musicplaystuff.musicControl;
+package blue.person.musicplaystuff.musicControl.OrderControls;
 
 /**
  * 顺序播放控制器
+ * 列表循环
  */
 public class normalOrder implements iOrderControl {
 
@@ -17,5 +18,15 @@ public class normalOrder implements iOrderControl {
             tempOrder += length;
         }
         return tempOrder;
+    }
+
+    @Override
+    public iOrderControl nextOrder() {
+        return new randomOrder();
+    }
+
+    @Override
+    public String getOrderName() {
+        return "列表循环";
     }
 }

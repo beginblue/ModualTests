@@ -29,6 +29,7 @@ public class musicServiceConnection implements ServiceConnection, iMusicControl 
     @Override
     public void onServiceDisconnected(ComponentName name) {
         connected = false;
+        Log.i(TAG, "onServiceDisconnected: disconnected");
     }
 
     @Override

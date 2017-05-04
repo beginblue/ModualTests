@@ -1,4 +1,4 @@
-package blue.person.musicplaystuff.musicControl;
+package blue.person.musicplaystuff.musicControl.OrderControls;
 
 import java.util.Random;
 
@@ -19,5 +19,15 @@ public class randomOrder implements iOrderControl {
     @Override
     public int lastMusic(int length, int currentIndex) {
         return random.nextInt(length);
+    }
+
+    @Override
+    public iOrderControl nextOrder() {
+        return new singelOrder();
+    }
+
+    @Override
+    public String getOrderName() {
+        return "随机播放";
     }
 }

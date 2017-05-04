@@ -14,8 +14,8 @@ import java.util.List;
 
 import blue.person.music.Music;
 import blue.person.musicplaystuff.musicControl.PlayController;
-import blue.person.musicplaystuff.musicControl.normalOrder;
-import blue.person.musicplaystuff.musicControl.randomOrder;
+import blue.person.musicplaystuff.musicControl.OrderControls.normalOrder;
+import blue.person.musicplaystuff.musicControl.OrderControls.randomOrder;
 import blue.person.musicstuff.DBStuff.DBController;
 import blue.person.musicstuff.musicUtils.muscScan;
 

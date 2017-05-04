@@ -17,7 +17,7 @@ import java.util.Map;
  */
 
 public class Music
-        implements  Serializable {
+        implements Serializable {
 
     private static final long serialVersionUID = 314159265354L;
 
@@ -33,6 +33,8 @@ public class Music
     private long fileSize;//文件大小
     private String year;//年份
     private String comment;//评论备注
+    //private Bitmap cover;//图片  Bitmap 不可序列化
+    private byte[] coverBytes;
 
     public Music(long id, String title, String artist, String album, long duration, String uri, long albumId, String coverUri, String fileName, long fileSize, String year) {
         this.id = id;
@@ -58,7 +60,7 @@ public class Music
     }
 
     public String getTitle() {
-        return title;
+        return title.trim();
     }
 
     public void setTitle(String title) {
@@ -66,7 +68,7 @@ public class Music
     }
 
     public String getArtist() {
-        return artist;
+        return artist.trim();
     }
 
     public void setArtist(String artist) {
@@ -142,8 +144,6 @@ public class Music
     }
 
 
-
-
     /**
      * 2017.3.7
      * 解构mp3文件格式
@@ -151,13 +151,14 @@ public class Music
      */
 
 
-    private Bitmap cover; //封面
+    //private Bitmap cover; //封面
+    //private byte[] coverBytes;
     private String mFilePath; //文件位置
-    private Map<String,byte[]> ID3Data;
+    private Map<String, byte[]> ID3Data;
 
 
     public Music(String filePath) throws Exception {
-        if(!filePath.endsWith("mp3")){
+        if (!filePath.endsWith("mp3")) {
             throw new Exception("文件格式必须是MP3");
         }
         mFilePath = filePath;
@@ -165,7 +166,6 @@ public class Music
         readBlocks();
         progressDetails();
     }
-
 
 
     /**
@@ -242,31 +242,37 @@ public class Music
         for (String str :
                 ID3Data.keySet()) {
             byte[] data = ID3Data.get(str);
-           switch (str){
-               case "TRCK":
-                   this.setAlbumId(Integer.valueOf(readStr(data)));
-                   break;
-               case "COMM":
-                   this.setComment(readStr(data));
-                   break;
-               case "TALB":
-                   this.setAlbum(readStr(data));
-                   break;
-               case "TIT2":
-                   this.setTitle(readStr(data));
-                   break;
-               case "TPE1":
-                   this.setArtist(readStr(data));
-                   break;
-               case "APIC":
-                  // byte[] btmap =  new byte[data.length-13];
-                 //  System.arraycopy(data,13,btmap,0,data.length-13);
-                  // Log.e(mFilePath, "progressDetails: "+Bytes2HexString(btmap) );
-                   Bitmap bitmap = BitmapFactory.decodeByteArray(data,13,data.length-13);
-                   this.setCover(bitmap);
-                   break;
-               default:
-                   break;
+            switch (str) {
+                case "TRCK":
+                    this.setAlbumId(Integer.valueOf(readStr(data)));
+                    break;
+                case "COMM":
+                    this.setComment(readStr(data));
+                    break;
+                case "TALB":
+                    this.setAlbum(readStr(data));
+                    break;
+                case "TIT2":
+                    this.setTitle(readStr(data));
+                    break;
+                case "TPE1":
+                    this.setArtist(readStr(data));
+                    break;
+                case "APIC":
+                    // byte[] btmap =  new byte[data.length-13];
+                    //  System.arraycopy(data,13,btmap,0,data.length-13);
+                    // Log.e(mFilePath, "progressDetails: "+Bytes2HexString(btmap) );
+                    // Bitmap bitmap = BitmapFactory.decodeByteArray(data,13,data.length-13);
+
+                    coverBytes = new byte[data.length - 13];
+                    System.arraycopy(data, 13, coverBytes, 0, coverBytes.length);
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = 3;
+
+                    // this.setCover(bitmap);
+                    break;
+                default:
+                    break;
 
             }
         }
@@ -288,10 +294,6 @@ public class Music
         return stringBuilder.toString();
     }
 
-    private Bitmap decodeBitmap(byte[] data){
-
-        return null;
-    }
 
     private long bytesToLong(byte[] b) {
         if (b.length != 4) return -1;
@@ -322,10 +324,7 @@ public class Music
     }
 
     public Bitmap getCover() {
-        return this.cover;
+        return BitmapFactory.decodeByteArray(coverBytes, 0, coverBytes.length);
     }
 
-    public void setCover(Bitmap cover) {
-        this.cover = cover;
-    }
 }

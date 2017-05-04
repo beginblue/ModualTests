@@ -1,4 +1,4 @@
-package blue.person.musicplaystuff.musicControl;
+package blue.person.musicplaystuff.musicControl.OrderControls;
 
 /**
  * Created by getbl on 2017/1/11.
@@ -20,4 +20,17 @@ public interface iOrderControl {
      * @return 上一曲的位置
      */
     int lastMusic(int length, int currentIndex);
+
+    /**
+     * 下一个顺序
+     * @return 下一种播放顺序
+     */
+    iOrderControl nextOrder();
+
+    /**
+     * 获得当前播放模式的名称
+     * @return
+     */
+    String getOrderName();
+
 }

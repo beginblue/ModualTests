@@ -10,6 +10,7 @@ import android.util.Log;
 
 import blue.person.music.Music;
 import blue.person.musicplaystuff.iMusicControl;
+import blue.person.musicplaystuff.musicControl.BroadcastReceivers;
 
 public class MusicPlayServ extends Service
         implements iMusicControl {
@@ -74,7 +75,7 @@ public class MusicPlayServ extends Service
      */
     @Override
     public IBinder onBind(Intent intent) {
-        // Toast.makeText(this, "onBind", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onBind", Toast.LENGTH_SHORT).show();
 
         mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         return mBinder;
@@ -88,10 +89,11 @@ public class MusicPlayServ extends Service
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // Toast.makeText(this, "started", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "started", Toast.LENGTH_SHORT).show();
         mMusicPlayer = new MusicPlayer(MusicPlayServ.this);
         return super.onStartCommand(intent, flags, startId);
     }
+
 
 
     @Override
@@ -100,18 +102,21 @@ public class MusicPlayServ extends Service
         mCurrentMusic=music;
         updateNotification(mCurrentMusic);
         mMusicPlayer.start(mCurrentMusic);
+        sendBroadcast(new Intent(BroadcastReceivers.onStartAction));
     }
 
     @Override
     public void pause() {
 
         mMusicPlayer.pause();
+        sendBroadcast(new Intent(BroadcastReceivers.onPauseAction));
     }
 
     @Override
     public void stop() {
         cancelNotification();
         mMusicPlayer.stop();
+        sendBroadcast(new Intent(BroadcastReceivers.onStopAction));
     }
 
     @Override

@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">MusicStuff</string>
     <string name="sp_isLocalMusicSearched">isLocalMusicSearched</string>
-    <string name="sql_create_lists_table">create table if not exists musicLists  (name varchar(20), time varchar(20))</string>
+    <string name="sql_create_lists_table">create table if not exists musicLists  (name varchar(20), amount int)</string>
 </resources>

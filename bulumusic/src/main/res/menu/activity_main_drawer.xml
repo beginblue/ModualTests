@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_myMusic"
+
+            android:title="我的歌曲" />
+        <item
+            android:id="@+id/nav_musicLists"
+
+            android:title="我的歌单" />
+        <item
+            android:id="@+id/nav_myFavourite"
+
+            android:title="我喜欢的歌" />
+
+    </group>
+
+    <item android:title="其他">
+        <menu>
+            <item
+                android:id="@+id/settings"
+
+                android:title="设置" />
+            <item
+                android:id="@+id/nav_exit"
+
+                android:title="退出" />
+        </menu>
+    </item>
+
+</menu>

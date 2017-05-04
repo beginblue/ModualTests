@@ -67,6 +67,7 @@ public class MusicPlayer implements iMusicControl, AudioManager.OnAudioFocusChan
 
     @Override
     public void pause() {
+        Log.i(TAG, "pause: pause tapped"+mMediaPlayer.isPlaying());
         if (mMediaPlayer.isPlaying()) {
             mAudioManager.abandonAudioFocus(this);
             mMediaPlayer.pause();
