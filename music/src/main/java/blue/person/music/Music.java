@@ -75,21 +75,12 @@ public class Music
         this.artist = artist;
     }
 
-    public String getAlbum() {
-        return album;
-    }
 
     public void setAlbum(String album) {
         this.album = album;
     }
 
-    public long getDuration() {
-        return duration;
-    }
 
-    public void setDuration(long duration) {
-        this.duration = duration;
-    }
 
     public String getUri() {
         return uri;
@@ -99,41 +90,17 @@ public class Music
         this.uri = uri;
     }
 
-    public long getAlbumId() {
-        return albumId;
-    }
 
     public void setAlbumId(long albumId) {
         this.albumId = albumId;
     }
 
-    public String getCoverUri() {
-        return coverUri;
-    }
-
-    public void setCoverUri(String coverUri) {
-        this.coverUri = coverUri;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
-    public long getFileSize() {
-        return fileSize;
-    }
 
-    public void setFileSize(long fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public String getYear() {
-        return year;
-    }
 
     public void setYear(String year) {
         this.year = year;
@@ -151,9 +118,7 @@ public class Music
      */
 
 
-    //private Bitmap cover; //封面
-    //private byte[] coverBytes;
-    private String mFilePath; //文件位置
+  private String mFilePath; //文件位置
     private Map<String, byte[]> ID3Data;
 
 
@@ -173,7 +138,7 @@ public class Music
      *
      * @throws IOException 文件找不到
      */
-    public void readBlocks() throws IOException {
+    private void readBlocks() throws IOException {
         ID3Data = new HashMap<>();
         byte[] bytes = new byte[4];
         FileInputStream fileStream = new FileInputStream(new File(mFilePath));//文件转为流
@@ -238,7 +203,7 @@ public class Music
      * TPE1:Mt.Ember // lead performer
      * APIC //图片文件的字节
      */
-    public void progressDetails() throws UnsupportedEncodingException {
+    private void progressDetails() throws UnsupportedEncodingException {
         for (String str :
                 ID3Data.keySet()) {
             byte[] data = ID3Data.get(str);
@@ -315,9 +280,6 @@ public class Music
         return res;
     }
 
-    public String getComment() {
-        return comment;
-    }
 
     public void setComment(String comment) {
         this.comment = comment;
@@ -326,5 +288,7 @@ public class Music
     public Bitmap getCover() {
         return BitmapFactory.decodeByteArray(coverBytes, 0, coverBytes.length);
     }
+
+
 
 }

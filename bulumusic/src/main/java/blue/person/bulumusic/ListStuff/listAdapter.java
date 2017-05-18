@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import blue.person.bulumusic.R;
-import blue.person.bulumusic.Universal;
+import blue.person.bulumusic.ShareDataApplication;
 import blue.person.music.Music;
 import blue.person.musicstuff.DBStuff.DBController;
 
@@ -43,11 +43,11 @@ public class listAdapter extends RecyclerView.Adapter<listAdapter.listHolder> {
 
     private int mode;
 
-    public listAdapter(Context context, int mode, Intent intent) {
+    public listAdapter(Context context, int mode, Intent intent, ShareDataApplication app) {
         mContext = context;
         this.mode = mode;
         mIntent = intent;
-        mDBController = Universal.newInstance(mContext).getDBController();
+        mDBController = app.getDBController();
         mStringIntegerMap = mDBController.getMusicLists();
         initData();
     }

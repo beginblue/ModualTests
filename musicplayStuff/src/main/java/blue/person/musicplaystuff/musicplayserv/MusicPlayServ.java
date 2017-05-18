@@ -135,4 +135,14 @@ public class MusicPlayServ extends Service
 
     }
 
+    @Override
+    public long getCurrentPosition() {
+        return mMusicPlayer.getCurrentPosition();
+    }
+
+    @Override
+    public long getDuration() {
+        return mMusicPlayer.getDuration();
+    }
+
 }

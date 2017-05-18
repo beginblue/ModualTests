@@ -30,8 +30,9 @@ import java.util.List;
 
 import blue.person.bulumusic.ListStuff.MusicListListActivity;
 import blue.person.bulumusic.ListStuff.listAdapter;
+import blue.person.bulumusic.MusicPlayDetailAcitivityStuff.MusicPlayDetailActivity;
 import blue.person.bulumusic.R;
-import blue.person.bulumusic.Universal;
+import blue.person.bulumusic.ShareDataApplication;
 import blue.person.music.Music;
 import blue.person.musicplaystuff.musicControl.BroadcastReceivers;
 import blue.person.musicplaystuff.musicControl.PlayController;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity
     PlayController mPlayController;
     BroadcastReceivers mBroadcastReceivers;
     NavigationView navigationView;
+    String listName;
     final int START_LIST_ACTIVITY = 21;
 
     /**
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity
     private void initialStuff() {
 
         mMusicList = new ArrayList<>();
-        mListAdapter = new recyclerViewAdapter(this);
+        mListAdapter = new recyclerViewAdapter(this, (ShareDataApplication) getApplication());
         mOnSearchReturnedHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity
                         mMusicList = muscScan.getLocalMusicList();
                         mDBController.addMusicListToTable("localMusic", mMusicList, 0);
                         mDBController.addNewMusicList("localMusic", mMusicList.size());
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -81,20 +84,29 @@ public class MainActivity extends AppCompatActivity
                 // Universal.newInstance(MainActivity.this).preparePlayController(mMusicList);
 
                 mListAdapter.setMusicList(mMusicList, "localMusic");
+                listName = "localMusic";
+
                 //RecyclerView Stuff
                 recyclerView = (RecyclerView) findViewById(R.id.recycle_items);
                 recyclerView.setAdapter(mListAdapter);
                 recyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
                 recyclerView.setItemAnimator(new DefaultItemAnimator());
                 recyclerView.addItemDecoration(new itemDecoration());
-                mPlayController = Universal.newInstance(MainActivity.this).getPlayController(mMusicList);
+                mPlayController = ((ShareDataApplication)getApplication()).getPlayController(mMusicList);
                 //TODO:刷新完的下一步
+
+                Music music = mMusicList.get(0);
+                headerImage.setImageBitmap(music.getCover());
+                headerTitle.setText(music.getTitle());
+                headerAuthor.setText(music.getArtist());
 
                 mLoadingDialog.cancel();
 
+
+
             }
         };
-        mDBController = Universal.newInstance(MainActivity.this).prepareDBController().getDBController();
+        mDBController = ((ShareDataApplication)getApplication()).getDBController();
         mLoadingDialog =
                 new AlertDialog.Builder(this)
                         .setTitle("Loading")
@@ -142,6 +154,7 @@ public class MainActivity extends AppCompatActivity
         initialStuff();
 
 
+
     }
 
     @Override
@@ -153,6 +166,12 @@ public class MainActivity extends AppCompatActivity
             exitConfirm();
             // super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mBroadcastReceivers.unregisterAllBroadcastReceivers();
     }
 
     @Override
@@ -214,7 +233,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStop() {
-        Universal.newInstance(this).release();
         super.onStop();
     }
 
@@ -255,6 +273,13 @@ public class MainActivity extends AppCompatActivity
         headerTitle = (TextView) inflate.findViewById(R.id.tv_header_title);
         headerAuthor = (TextView) inflate.findViewById(R.id.tv_header_author);
         headerImage = (ImageView) inflate.findViewById(R.id.header_imageView);
+        headerImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MusicPlayDetailActivity.class);
+                startActivity(intent);
+            }
+        });
         navigationView.addHeaderView(inflate);
     }
 
@@ -282,6 +307,7 @@ public class MainActivity extends AppCompatActivity
             if (data != null) {
                 String title = data.getStringExtra("title");
                 List<Music> list = mDBController.getMusicList(title);
+                listName = title;
                 mListAdapter.setMusicList(list, title);
             }
         }
@@ -298,6 +324,7 @@ public class MainActivity extends AppCompatActivity
             headerTitle.setText(music.getTitle());
             headerAuthor.setText(music.getArtist());
             headerImage.setImageBitmap(music.getCover());
+
         }
     }
 

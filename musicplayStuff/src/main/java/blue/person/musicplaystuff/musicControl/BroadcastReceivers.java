@@ -28,31 +28,40 @@ public class BroadcastReceivers {
     public static final String onNextAction = "blue.broadcast.NEXT_MUSIC";
     public static final String onStartActionIndex = "blue.broadcast.START.INDEX";
 
-    public static void sendBroadcast(Context context, String  broadcast, @Nullable Music music){
+    public static void sendBroadcast(Context context, String broadcast, @Nullable Music music) {
         Intent intent = new Intent(broadcast);
-        if(music != null){
+        if (music != null) {
 //            intent.putExtra("Title",music.getTitle());
 //            intent.putExtra("Author",music.getArtist());
 //            intent.putExtra("Image",music.getCover());
-            intent.putExtra("Music",music);
+            intent.putExtra("Music", music);
         }
         context.sendBroadcast(intent);
     }
 
-    public static void sendBroadcast(Context context,int index){
+    public static void sendBroadcast(Context context, int index) {
         Intent intent = new Intent(onStartActionIndex);
-        intent.putExtra("Index",index);
+        intent.putExtra("Index", index);
         context.sendBroadcast(intent);
+    }
+
+    public void unregisterAllBroadcastReceivers() {
+        if (ocbrStart != null) mContext.unregisterReceiver(ocbrStart);
+        if (ocbrPause != null) mContext.unregisterReceiver(ocbrPause);
+        if (ocbrStop != null) mContext.unregisterReceiver(ocbrStop);
+        if (ocbrNext != null) mContext.unregisterReceiver(ocbrNext);
+        if (ocbrStartActionIndex != null) mContext.unregisterReceiver(ocbrStartActionIndex);
     }
 
     public static abstract class BroadcastResolver {
 
-        protected Intent mIntent ;
-        public BroadcastResolver(){
+        protected Intent mIntent;
+
+        public BroadcastResolver() {
 
         }
 
-        public void setIntent(Intent intent){
+        public void setIntent(Intent intent) {
             mIntent = intent;
         }
 
@@ -78,38 +87,49 @@ public class BroadcastReceivers {
         }
     }
 
+    private onCommonBroadcastReceiver ocbrStart;
 
     public void setOnStartListener(BroadcastResolver onStartListener) {
-        onCommonBroadcastReceiver ocbr = new onCommonBroadcastReceiver(onStartListener);
-        mContext.registerReceiver(ocbr,
+
+        ocbrStart = new onCommonBroadcastReceiver(onStartListener);
+        mContext.registerReceiver(ocbrStart,
                 new IntentFilter(onStartAction));
 
     }
 
+    private onCommonBroadcastReceiver ocbrStop;
+
     public void setOnStopListener(BroadcastResolver onStopListener) {
-        onCommonBroadcastReceiver ocbr = new onCommonBroadcastReceiver(onStopListener);
-        mContext.registerReceiver(ocbr,
+
+        ocbrStop = new onCommonBroadcastReceiver(onStopListener);
+        mContext.registerReceiver(ocbrStop,
                 new IntentFilter(onStopAction));
     }
 
+    private onCommonBroadcastReceiver ocbrPause;
 
     public void setOnPauseListener(BroadcastResolver onPauseListener) {
-        onCommonBroadcastReceiver ocbr = new onCommonBroadcastReceiver(onPauseListener);
-        mContext.registerReceiver(ocbr,
+
+        ocbrPause = new onCommonBroadcastReceiver(onPauseListener);
+        mContext.registerReceiver(ocbrPause,
                 new IntentFilter(onPauseAction));
     }
 
+    private onCommonBroadcastReceiver ocbrNext;
 
-    public void setOnNextListener(BroadcastResolver onNextListener){
-        onCommonBroadcastReceiver ocbr = new onCommonBroadcastReceiver(onNextListener);
-        mContext.registerReceiver(ocbr,
+    public void setOnNextListener(BroadcastResolver onNextListener) {
+
+        ocbrNext = new onCommonBroadcastReceiver(onNextListener);
+        mContext.registerReceiver(ocbrNext,
                 new IntentFilter(onNextAction));
     }
 
+    private onCommonBroadcastReceiver ocbrStartActionIndex;
 
-    public void setOnStartActionIndexListener(BroadcastResolver onStartActionIndexListener){
-        onCommonBroadcastReceiver ocbr = new onCommonBroadcastReceiver(onStartActionIndexListener);
-        mContext.registerReceiver(ocbr,
+    public void setOnStartActionIndexListener(BroadcastResolver onStartActionIndexListener) {
+
+        ocbrStartActionIndex = new onCommonBroadcastReceiver(onStartActionIndexListener);
+        mContext.registerReceiver(ocbrStartActionIndex,
                 new IntentFilter(onStartActionIndex));
     }
 

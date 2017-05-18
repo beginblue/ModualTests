@@ -1,4 +1,4 @@
-package com.blue.modualtests;
+package blue.person.internetstuff;
 
 import org.junit.Test;
 
@@ -10,6 +10,6 @@ import org.junit.Test;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
-
+        new LRCRequests().requestList("Impossible",228022);
     }
 }

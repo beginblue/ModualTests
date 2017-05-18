@@ -9,7 +9,6 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.MediaPlayer.OnSeekCompleteListener;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -103,6 +102,16 @@ public class MusicPlayer implements iMusicControl, AudioManager.OnAudioFocusChan
 
     }
 
+    @Override
+    public long getCurrentPosition() {
+        return mMediaPlayer.getCurrentPosition();
+    }
+
+    @Override
+    public long getDuration() {
+        return mMediaPlayer.getDuration();
+    }
+
     /**
      * 播放焦点改变的回调
      * @param focusChange 焦点改变
@@ -130,7 +139,7 @@ public class MusicPlayer implements iMusicControl, AudioManager.OnAudioFocusChan
 
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
-            Toast.makeText(mContext, "Something went wrong", Toast.LENGTH_SHORT).show();
+
             Log.e(TAG, "onError: " + what + ":" + extra);
             return false;
         }

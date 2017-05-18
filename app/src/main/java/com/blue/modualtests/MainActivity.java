@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
             super.handleMessage(msg);
             if (msg.what == muscScan.SEARCH_MUSIC_SUCCESS) {
                 musicList = muscScan.getLocalMusicList();
-                DBController.addMusicListToTable("localMusic", musicList);
+                DBController.addMusicListToTable("localMusic", musicList,0);
             } else if (msg.what == muscScan.MUSIC_ALREADY_SEARCHED) {
                 musicList = DBController.getMusicList("localMusic");
             }else if(msg.what == muscScan.MUSIC_SEARCH_ERROR){

@@ -9,7 +9,7 @@
         android:id="@+id/iv_album"
         android:layout_width="wrap_content"
         android:layout_height="170dp"
-        android:background="#66ccff"
+        android:background="#0066ccff"
         android:scaleType="centerInside" />
 
     <LinearLayout

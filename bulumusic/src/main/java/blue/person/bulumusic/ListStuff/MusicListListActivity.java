@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import blue.person.bulumusic.MainActivityStuff.itemDecoration;
 import blue.person.bulumusic.R;
+import blue.person.bulumusic.ShareDataApplication;
 
 public class MusicListListActivity extends AppCompatActivity {
 
@@ -30,7 +31,7 @@ public class MusicListListActivity extends AppCompatActivity {
         Intent intent = getIntent();
         int mode = intent.getIntExtra("mode", listAdapter.MODE_SELECT);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list_list_recycler);
-        mListAdapter = new listAdapter(this, mode, intent);
+        mListAdapter = new listAdapter(this, mode, intent,(ShareDataApplication)getApplication());
         mListAdapter.setOnClickListener(new listAdapter.onClickListener() {
             @Override
             public void run_select(String title) {

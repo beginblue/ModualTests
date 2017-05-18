@@ -46,4 +46,16 @@ public interface iMusicControl {
      * 上一曲
      */
     void last();
+
+
+    /**
+     * 获取当前播放位置
+     * @return 当前播放位置的毫秒数
+     */
+    long getCurrentPosition();
+
+    /**
+     * 获取歌曲长度
+     */
+    long getDuration();
 }

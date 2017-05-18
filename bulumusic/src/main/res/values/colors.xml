@@ -3,4 +3,6 @@
     <color name="colorPrimary">#058e33</color>
     <color name="colorPrimaryDark">#058e33</color>
     <color name="colorAccent">#efa421</color>
+    <color name="colorLrcViewBackgroundClicked">#11000000</color>
+    <color name="colorLrcViewBackgroundNotClicked">#00000000</color>
 </resources>

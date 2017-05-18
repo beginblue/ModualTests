@@ -24,7 +24,7 @@ import blue.person.musicplaystuff.musicplayserv.musicServiceConnection;
  * First test finished on 2017.2.10.
  */
 
-public class PlayController implements iMusicControl {
+public  class PlayController implements iMusicControl {
 
     public void setContext(Context context) {
         mContext = context;
@@ -167,17 +167,17 @@ public class PlayController implements iMusicControl {
     @Override
     public void pause() {
         mMusicServiceConnection.pause();
-        BroadcastReceivers.sendBroadcast(mContext,
-                BroadcastReceivers.onPauseAction
-                , null);
+//        BroadcastReceivers.sendBroadcast(mContext,
+//                BroadcastReceivers.onPauseAction
+//                , null);
     }
 
     @Override
     public void stop() {
         mMusicServiceConnection.stop();
-        BroadcastReceivers.sendBroadcast(mContext,
-                BroadcastReceivers.onStopAction,
-                null);
+//        BroadcastReceivers.sendBroadcast(mContext,
+//                BroadcastReceivers.onStopAction,
+//                null);
     }
 
     @Override
@@ -213,6 +213,16 @@ public class PlayController implements iMusicControl {
         play(last);
     }
 
+    @Override
+    public long getCurrentPosition() {
+        return mMusicServiceConnection.getCurrentPosition();
+    }
+
+    @Override
+    public long getDuration() {
+        return mMusicServiceConnection.getDuration();
+    }
+
 
     /**
      * 播放选中的列表
@@ -221,8 +231,9 @@ public class PlayController implements iMusicControl {
     public void play(int index) {
         currentIndex = index;
         start(mMusicList.get(index));
-        BroadcastReceivers.sendBroadcast(mContext,index);
+       // BroadcastReceivers.sendBroadcast(mContext,index);
     }
+
 
 
     public void changeOrder() {
@@ -237,5 +248,9 @@ public class PlayController implements iMusicControl {
         mContext.unregisterReceiver(mrcReceiver);
         mContext.unregisterReceiver(mReceiver);
         mContext.unbindService(mMusicServiceConnection);
+    }
+
+    public int getCurrentIndex(){
+        return currentIndex;
     }
 }

@@ -64,5 +64,15 @@ public class musicServiceConnection implements ServiceConnection, iMusicControl 
 
     }
 
+    @Override
+    public long getCurrentPosition() {
+        return _service.getCurrentPosition();
+    }
+
+    @Override
+    public long getDuration() {
+        return _service.getDuration();
+    }
+
 
 }

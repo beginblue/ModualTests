@@ -18,7 +18,7 @@ import java.util.List;
 import blue.person.bulumusic.ListStuff.MusicListListActivity;
 import blue.person.bulumusic.ListStuff.listAdapter;
 import blue.person.bulumusic.R;
-import blue.person.bulumusic.Universal;
+import blue.person.bulumusic.ShareDataApplication;
 import blue.person.music.Music;
 import blue.person.musicplaystuff.musicControl.PlayController;
 
@@ -33,9 +33,11 @@ class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapter.itemH
     private Context mContext;
     private PlayController mPlayController;
     private String listName;
+    private ShareDataApplication mapp;
 
-    recyclerViewAdapter(Context context) {
+    recyclerViewAdapter(Context context, ShareDataApplication app) {
         mContext = context;
+        mapp = app;
 //        mPlayController = Universal.newInstance(mContext).getPlayController();
     }
 
@@ -44,7 +46,7 @@ class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapter.itemH
         mMusicList = musicList;
         this.listName = listName;
         if (mPlayController == null) {
-            mPlayController = Universal.newInstance(mContext).getPlayController(mMusicList);
+            mPlayController = mapp.getPlayController(mMusicList);
         } else mPlayController.setMusicList(mMusicList);
         notifyDataSetChanged();
     }
@@ -139,9 +141,7 @@ class recyclerViewAdapter extends RecyclerView.Adapter<recyclerViewAdapter.itemH
                             mContext.startActivity(intent);
                             break;
                         case R.id.removeFromList:
-                            Universal
-                                    .newInstance(mContext)
-                                    .getDBController()
+                            mapp.getDBController()
                                     .removeMusicFromList(listName
                                             , mMusicList
                                                     .get(position)
