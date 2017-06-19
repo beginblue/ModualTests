@@ -37,11 +37,13 @@ public class DBController implements iDBControl {
     /**
      * 构造
      *
-     * @param context 务必使用Application的Context //why? 2017.4.22
+     * @param context 务必使用Application的Context
+     *                //why? 2017.4.22
+     *                because DBController 是一个活在Application中的对象
+     *
      */
     public DBController(Context context) {
         mContext = context;
-        //Looper.prepare();
         mSQLiteOpenHelper = new DBOpenHelper(mContext, "tables.db", null, 1);
         db = mSQLiteOpenHelper.getWritableDatabase();
         db.execSQL(mContext.getString(R.string.sql_create_lists_table));
@@ -77,8 +79,6 @@ public class DBController implements iDBControl {
             db.execSQL("create table localMusic (name varchar(20),object blob);");
             muscScan.scanLocalMusic(handler);
         } catch (Exception e) {
-
-//            Log.e("scanTest", "scanMusic:  begin drop" );
             e.printStackTrace();
             handler.sendEmptyMessage(muscScan.MUSIC_ALREADY_SEARCHED);
 

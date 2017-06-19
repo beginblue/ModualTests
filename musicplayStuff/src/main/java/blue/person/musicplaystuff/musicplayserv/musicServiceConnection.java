@@ -74,5 +74,10 @@ public class musicServiceConnection implements ServiceConnection, iMusicControl 
         return _service.getDuration();
     }
 
+    @Override
+    public double getPlayedPercent(){
+        return _service.getPlayedPercent();
+    }
+
 
 }

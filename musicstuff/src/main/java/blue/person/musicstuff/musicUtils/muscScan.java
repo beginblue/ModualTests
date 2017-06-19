@@ -18,8 +18,9 @@ import blue.person.music.Music;
 
 public class muscScan {
     public static final int SEARCH_MUSIC_SUCCESS = 1;      //扫描成功
-    public static final int MUSIC_ALREADY_SEARCHED = 0;    //列表已存在
+    public static final int MUSIC_ALREADY_SEARCHED = 0;    //曾经扫描过，列表已存在
     public static final int MUSIC_SEARCH_ERROR = 2;        //扫描出现错误
+
     private static List<String> list = new ArrayList<>();  //歌曲地址
     private static Handler sHandler;//处理器
     private static String TAG = "musicScanmm";
@@ -65,7 +66,6 @@ public class muscScan {
                 Log.d(TAG, "run: started");
                 try {
                     String[] ext = {".mp3"};
-
                     File file = Environment.getExternalStorageDirectory();
                     //File file = Environment.getDataDirectory();
                     searchMp3Infos(file, ext);

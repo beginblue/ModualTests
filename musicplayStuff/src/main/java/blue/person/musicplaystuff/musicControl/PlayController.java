@@ -24,7 +24,7 @@ import blue.person.musicplaystuff.musicplayserv.musicServiceConnection;
  * First test finished on 2017.2.10.
  */
 
-public  class PlayController implements iMusicControl {
+public class PlayController implements iMusicControl {
 
     public void setContext(Context context) {
         mContext = context;
@@ -42,7 +42,7 @@ public  class PlayController implements iMusicControl {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "Received", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(context, "Received", Toast.LENGTH_SHORT).show();
             int nextIndex = mOrderControl.nextMusic(mMusicList.size(), currentIndex);
             play(nextIndex);
         }
@@ -158,9 +158,9 @@ public  class PlayController implements iMusicControl {
     public void start(Music music) {
         Log.i(TAG, "start: ???");
         mMusicServiceConnection.start(music);
-       // BroadcastReceivers.sendBroadcast(mContext,
-       //        BroadcastReceivers.onStartAction,
-       /////         music);
+        // BroadcastReceivers.sendBroadcast(mContext,
+        //        BroadcastReceivers.onStartAction,
+        /////         music);
 
     }
 
@@ -223,6 +223,11 @@ public  class PlayController implements iMusicControl {
         return mMusicServiceConnection.getDuration();
     }
 
+    @Override
+    public double getPlayedPercent() {
+            return mMusicServiceConnection.getPlayedPercent();
+    }
+
 
     /**
      * 播放选中的列表
@@ -231,9 +236,14 @@ public  class PlayController implements iMusicControl {
     public void play(int index) {
         currentIndex = index;
         start(mMusicList.get(index));
-       // BroadcastReceivers.sendBroadcast(mContext,index);
-    }
+        try {
+            Thread.sleep(1000);
+            BroadcastReceivers.sendBroadcast(mContext,index);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
+    }
 
 
     public void changeOrder() {
@@ -250,7 +260,7 @@ public  class PlayController implements iMusicControl {
         mContext.unbindService(mMusicServiceConnection);
     }
 
-    public int getCurrentIndex(){
+    public int getCurrentIndex() {
         return currentIndex;
     }
 }

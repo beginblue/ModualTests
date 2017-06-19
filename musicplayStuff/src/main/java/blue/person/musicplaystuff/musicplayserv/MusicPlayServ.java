@@ -2,8 +2,10 @@ package blue.person.musicplaystuff.musicplayserv;
 
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -67,7 +69,6 @@ public class MusicPlayServ extends Service
 
 
     Binder mBinder;
-
     /**
      * 绑定成功后执行
      * @param intent intent
@@ -76,8 +77,10 @@ public class MusicPlayServ extends Service
     @Override
     public IBinder onBind(Intent intent) {
         //Toast.makeText(this, "onBind", Toast.LENGTH_SHORT).show();
-
         mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        IntentFilter filter = new IntentFilter(BroadcastReceivers.onStartOrderAction);
+        registerReceiver(new onStartOrPauseOrderReceiver(),filter);
+
         return mBinder;
     }
 
@@ -109,6 +112,7 @@ public class MusicPlayServ extends Service
     public void pause() {
 
         mMusicPlayer.pause();
+
         sendBroadcast(new Intent(BroadcastReceivers.onPauseAction));
     }
 
@@ -144,5 +148,18 @@ public class MusicPlayServ extends Service
     public long getDuration() {
         return mMusicPlayer.getDuration();
     }
+
+    @Override
+    public double getPlayedPercent() {
+        return mMusicPlayer.getPlayedPercent();
+    }
+
+    private class onStartOrPauseOrderReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MusicPlayServ.this.pause();
+        }
+    }
+
 
 }

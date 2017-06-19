@@ -15,6 +15,7 @@ import blue.person.music.Music;
 
 public class BroadcastReceivers {
 
+
     private Context mContext;
 
     public BroadcastReceivers(Context context) {
@@ -27,6 +28,7 @@ public class BroadcastReceivers {
     public static final String onStopAction = "blue.broadcast.STOP";
     public static final String onNextAction = "blue.broadcast.NEXT_MUSIC";
     public static final String onStartActionIndex = "blue.broadcast.START.INDEX";
+    public static final  String onStartOrderAction = "blue.broadcast.START_ORDER";
 
     public static void sendBroadcast(Context context, String broadcast, @Nullable Music music) {
         Intent intent = new Intent(broadcast);

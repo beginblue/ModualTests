@@ -5,17 +5,22 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".ShareDataApplication"
         android:allowBackup="true"
         android:icon="@drawable/logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name=".ShareDataApplication">
+        android:theme="@style/AppTheme">
         <activity android:name=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="blue.bulumusic.MAIN" />
+
+                <category android:name="blue.bulumusic.MAIN_C" />
             </intent-filter>
         </activity>
         <activity
@@ -23,7 +28,9 @@
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ListStuff.MusicListListActivity" />
-        <activity android:name=".MusicPlayDetailAcitivityStuff.MusicPlayDetailActivity"></activity>
+        <activity android:name=".MusicPlayDetailAcitivityStuff.MusicPlayDetailActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".MusicPlayDetailAcitivityStuff.selectLRCStuff.selectLRCActivity"></activity>
     </application>
 
 </manifest>

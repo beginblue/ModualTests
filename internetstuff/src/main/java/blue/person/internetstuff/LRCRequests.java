@@ -1,5 +1,7 @@
 package blue.person.internetstuff;
 
+import android.util.Log;
+
 import org.ow2.util.base64.Base64;
 
 import java.io.BufferedReader;
@@ -61,9 +63,12 @@ public class LRCRequests {
      * hash=歌曲Hash值
      */
     public RequestListEntity requestList(String name, long duration) throws IOException {
+       String url = "http://lyrics.kugou.com/search?ver=1&man=yes&client=pc&keyword=" + name + "&duration=" + duration + "&hash=";
         HttpURLConnection connection = (HttpURLConnection)
-                new URL("http://lyrics.kugou.com/search?ver=1&man=yes&client=pc&keyword=" + name + "&duration=" + duration + "&hash=")
+                new URL(url)
                         .openConnection();
+        Log.e("bulumusicURL", "requestList: "+url );
+        connection.setConnectTimeout(3000);
         InputStream inputStream = connection.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String str = reader.readLine();
@@ -80,10 +85,12 @@ public class LRCRequests {
     public String getLRCs(String accessKey, String id) {
         HttpURLConnection connection = null;
         try {
+            String url = "http://lyrics.kugou.com/download?ver=1&client=pc&id=" + id + "&accesskey=" + accessKey + "&fmt=lrc&charset=utf8";
             connection = (HttpURLConnection)
-                    new URL("http://lyrics.kugou.com/download?ver=1&client=pc&id=" + id + "&accesskey=" + accessKey + "&fmt=lrc&charset=utf8")
+                    new URL(url)
                             .openConnection();
             connection.setConnectTimeout(5000);
+            Log.e("bulumusicURL", "requestList: "+url );
             InputStream inputStream = connection.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String str = reader.readLine();

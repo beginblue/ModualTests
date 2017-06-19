@@ -48,7 +48,7 @@ public class MusicPlayer implements iMusicControl, AudioManager.OnAudioFocusChan
     public void start(Music music) {
         String songPath = music.getUri();
         mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-        Log.i(TAG, "start: starting " + songPath);
+        Log.e(TAG, "start: starting " + songPath);
         try {
             if (!mMediaPlayer.isPlaying()) {
                 mMediaPlayer.reset();
@@ -66,13 +66,13 @@ public class MusicPlayer implements iMusicControl, AudioManager.OnAudioFocusChan
 
     @Override
     public void pause() {
-        Log.i(TAG, "pause: pause tapped"+mMediaPlayer.isPlaying());
+        Log.i(TAG, "pause: pause tapped" + mMediaPlayer.isPlaying());
         if (mMediaPlayer.isPlaying()) {
             mAudioManager.abandonAudioFocus(this);
             mMediaPlayer.pause();
         } else {
             Log.i(TAG, "pause: start???");
-            mAudioManager.requestAudioFocus(this,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
+            mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             mMediaPlayer.start();
         }
     }
@@ -112,8 +112,17 @@ public class MusicPlayer implements iMusicControl, AudioManager.OnAudioFocusChan
         return mMediaPlayer.getDuration();
     }
 
+    @Override
+    public double getPlayedPercent()  {
+
+            double playedPercent = getCurrentPosition() / getDuration();
+            return playedPercent;
+
+    }
+
     /**
      * 播放焦点改变的回调
+     *
      * @param focusChange 焦点改变
      */
     @Override
@@ -149,7 +158,7 @@ public class MusicPlayer implements iMusicControl, AudioManager.OnAudioFocusChan
 
         @Override
         public void onSeekComplete(MediaPlayer mp) {
-            mAudioManager.requestAudioFocus(MusicPlayer.this,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
+            mAudioManager.requestAudioFocus(MusicPlayer.this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             mp.start();
         }
     }

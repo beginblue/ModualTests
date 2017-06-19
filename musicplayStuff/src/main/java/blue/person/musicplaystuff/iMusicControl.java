@@ -58,4 +58,11 @@ public interface iMusicControl {
      * 获取歌曲长度
      */
     long getDuration();
+
+
+    /**
+     * 获得当前播放进度
+     * @return 当前播放进度
+     */
+    double getPlayedPercent();
 }

@@ -1,19 +1,25 @@
 package blue.person.bulumusic.MusicPlayDetailAcitivityStuff;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
 
 import blue.person.bulumusic.MusicPlayDetailAcitivityStuff.UiStuff.LrcView;
+import blue.person.bulumusic.MusicPlayDetailAcitivityStuff.selectLRCStuff.selectLRCActivity;
 import blue.person.bulumusic.R;
 import blue.person.bulumusic.ShareDataApplication;
 import blue.person.internetstuff.LRCRequests;
@@ -35,8 +41,15 @@ public class MusicPlayDetailActivity extends AppCompatActivity {
     private SeekBar mSeekBar;
     private ImageView mCover;
     private boolean mIsLoadTaskRunning = false;
-
+    private downloadLRC downloadLRCTask;
     private boolean UpdateTurn = false;
+    private long duration;
+    private FrameLayout blackBack;
+    private Toolbar bar;
+    private boolean isPlaying = true;
+    private ImageButton btnStart;
+    private ImageButton btnNext;
+    private ImageButton btnLast;
 
 
     @Override
@@ -45,26 +58,61 @@ public class MusicPlayDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_music_play_detail);
 
         lrcView = (LrcView) findViewById(R.id.lrcView);
-
         mSeekBar = (SeekBar) findViewById(R.id.sb_prograssBar);
         mCover = (ImageView) findViewById(R.id.iv_cover);
         mDBController = ((ShareDataApplication) getApplication()).getDBController();
         mPlayController = ((ShareDataApplication) getApplication()).getPlayController(null);
         mMusicList = mPlayController.getMusicList();
-
+        blackBack = (FrameLayout) findViewById(R.id.blackback);
         mSeekBar.setIndeterminate(false);
         Music music = mMusicList.get(mPlayController.getCurrentIndex());
         mCover.setImageBitmap(music.getCover());
-        setTitle(music.getTitle());
-        new downloadLRC().execute(getPlayController());
-        new lrcUpdateTask().execute(getPlayController());
+        btnStart = (ImageButton) findViewById(R.id.btn_start);
+        btnNext = (ImageButton) findViewById(R.id.btn_forward);
+        btnLast = (ImageButton) findViewById(R.id.btn_back);
+        bar = (Toolbar) findViewById(R.id.toolbar);
+        bar.setTitle(music.getTitle());
+        setSupportActionBar(bar);
+        bar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MusicPlayDetailActivity.this.finish();
+            }
+        });
+//        getSupportActionBar().hide();
+        duration = mPlayController.getDuration();
+
+        downloadLRCTask = new downloadLRC();
+        downloadLRCTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, music.getTitle(), mPlayController.getDuration() + "");
 
         lrcView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MusicPlayDetailActivity.this, "test", Toast.LENGTH_SHORT).show();
-                int color = (lrcView.isClicked()) ? R.color.colorLrcViewBackgroundClicked : R.color.colorLrcViewBackgroundNotClicked;
-                lrcView.setBackgroundResource(color);
+                float alpha = Math.abs(blackBack.getAlpha() - 1f);
+                Log.e(TAG, "onClick: " + alpha);
+                blackBack.setAlpha(alpha);
+                lrcView.setAlpha(alpha);
+            }
+        });
+
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    int position = (int) ((progress * duration / 100));
+                    position = position > duration ? (int) (duration - 1000) : position;
+                    mPlayController.seekTo(position);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
 
@@ -78,23 +126,33 @@ public class MusicPlayDetailActivity extends AppCompatActivity {
         setBroadcastResolvers();
     }
 
+    private boolean mPause = false;
+
     private void setBroadcastResolvers() {
         mBroadcastReceivers.setOnStartListener(new BroadcastReceivers.BroadcastResolver() {
             @Override
             public void run() {
-                Log.e("OrderTests", "run: order test start");
+                UpdateTurn = false;
                 Music music = mMusicList.get(mPlayController.getCurrentIndex());
                 mCover.setImageBitmap(music.getCover());
-                setTitle(music.getTitle());
-                UpdateTurn = false;
-                new downloadLRC().execute(mPlayController);
+                bar.setTitle(music.getTitle());
+                btnStart.setImageResource(android.R.drawable.ic_media_pause);
+                mSeekBar.setProgress(0);
+                new downloadLRC().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, music.getTitle(), mPlayController.getDuration() + "");
+                Log.e(TAG, "run: order test start");
+
             }
         });
 
         mBroadcastReceivers.setOnPauseListener(new BroadcastReceivers.BroadcastResolver() {
             @Override
             public void run() {
-                Log.e("OrderTests", "run: order test pause");
+                if(!mPause) {
+                    btnStart.setImageResource(android.R.drawable.ic_media_play);
+                }else {
+                    btnStart.setImageResource(android.R.drawable.ic_media_pause);
+                }
+                    Log.e("OrderTests", "run: order test pause");
                 Log.i(TAG, "run: pause in the detail activity");
             }
         });
@@ -102,11 +160,15 @@ public class MusicPlayDetailActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Log.i(TAG, "run: stop in the detail activity");
+
+                UpdateTurn = false;
             }
         });
         mBroadcastReceivers.setOnNextListener(new BroadcastReceivers.BroadcastResolver() {
             @Override
             public void run() {
+
+
                 Log.e("OrderTests", "run: order test next");
             }
         });
@@ -197,13 +259,16 @@ public class MusicPlayDetailActivity extends AppCompatActivity {
         int id = view.getId();
         switch (id) {
             case R.id.btn_forward:
+                UpdateTurn = false;
                 mPlayController.next();
                 break;
             case R.id.btn_back:
-                mPlayController.seekTo((int) (mPlayController.getCurrentPosition() - 1000L));
+                UpdateTurn = false;
+                mPlayController.last();
                 break;
             case R.id.btn_start:
                 mPlayController.pause();
+                mPause = !mPause;
                 break;
             default:
                 break;
@@ -212,20 +277,18 @@ public class MusicPlayDetailActivity extends AppCompatActivity {
     }
 
 
-    public class downloadLRC extends AsyncTask<PlayController, Integer, String> {
-
-        PlayController playController;
+    public class downloadLRC extends AsyncTask<String, Integer, String> {
 
         @Override
-        protected String doInBackground(PlayController... params) {
-            playController = params[0];
+        protected String doInBackground(String... params) {
+            String title = params[0];
+            long duration = Long.valueOf(params[1]);
             String res = "";
-            Music currentMusic = mMusicList.get(playController.getCurrentIndex());
+            Log.e(TAG, "doInBackground: downloading start");
             LRCRequests requests = new LRCRequests();
             try {
                 List<RequestListEntity.CandidatesBean> lrcList = requests.requestList(
-                        currentMusic.getTitle(),
-                        playController.getDuration())
+                        title, duration)
                         .getCandidates();
                 if (lrcList != null && lrcList.size() > 0) {
                     String accessKey = lrcList.get(0).getAccesskey();
@@ -242,17 +305,16 @@ public class MusicPlayDetailActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-            Log.i(TAG, "onPostExecute: " + s);
+            Log.e(TAG, "onPostExecute: " + s);
             lrcView.loadLrc(s);
             UpdateTurn = true;
-            // if(!mIsLoadTaskRunning) new lrcUpdateTask().execute(mPlayController);
+            new lrcUpdateTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mPlayController);
         }
     }
 
-    public PlayController getPlayController(){
-        synchronized (mPlayController){
-            return mPlayController;
-        }
+    public PlayController getPlayController() {
+        return mPlayController;
+
     }
 
 
@@ -262,49 +324,80 @@ public class MusicPlayDetailActivity extends AppCompatActivity {
     public class lrcUpdateTask extends AsyncTask<PlayController, Integer, Boolean> {
 
         PlayController playController;
+
         @Override
         protected Boolean doInBackground(PlayController... params) {
             playController = params[0];
             mIsLoadTaskRunning = true;
-            int currentPosition = (int) playController.getCurrentPosition();
-            int duration = (int) playController.getDuration();
-            while (true) {
-                if (UpdateTurn && currentPosition < duration - 100) {
-                    try {
-                        publishProgress(currentPosition, duration);
-                        Thread.sleep(500);
-                        currentPosition = (int) playController.getCurrentPosition();
-                        duration = (int) playController.getDuration();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        return false;
-                    }
+            Log.e(TAG, "doInBackground: updating");
+            while (UpdateTurn) {
+
+                try {
+                    publishProgress((int) playController.getCurrentPosition());
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return false;
                 }
             }
-            //return true;
+            return true;
         }
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
             mIsLoadTaskRunning = false;
+            Log.e(TAG, "onPostExecute: updating stopped");
         }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-            lrcView.updateTime(playController.getCurrentPosition());
-            long progress = 0;
-            try {
+            lrcView.updateTime(values[0]);
 
-                progress = 100 * playController.getCurrentPosition() / playController.getDuration();
-            } catch (Exception e) {
-                Log.e(TAG, "run: ", e);
-            } finally {
-                mSeekBar.setProgress((int) progress);
-            }
+            mSeekBar.setProgress((int) ((values[0] * 100 / duration)));
+
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
 
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent(this, selectLRCActivity.class);
+        intent.putExtra(
+                selectLRCActivity.SONG_NAME,
+                mMusicList.get(mPlayController.getCurrentIndex()).getTitle()
+        );
+        intent.putExtra(
+                selectLRCActivity.SONG_DURATION,
+                mPlayController.getDuration()
+        );
+        startActivityForResult(intent, selectLRCActivity.RESULT_CODE);
+        return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
+        if (data == null) return;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String accessKey = data.getStringExtra(selectLRCActivity.ACCESS_KEY);
+                String id = data.getStringExtra(selectLRCActivity.ID);
+                final String lrCs = new LRCRequests().getLRCs(accessKey, id);
+                lrcView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        lrcView.loadLrc(lrCs);
+                    }
+                });
+            }
+        }).start();
+    }
 }

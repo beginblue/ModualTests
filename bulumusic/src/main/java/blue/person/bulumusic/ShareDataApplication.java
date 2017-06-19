@@ -33,15 +33,15 @@ public class ShareDataApplication extends Application {
 
     public PlayController getPlayController(@Nullable List<Music> musicList) {
         if (!isPREPARED()) {
-            synchronized (mPlayController) {
-                try {
-                    mPlayController = new PlayController(this);
-                    preparePlayer(musicList);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+
+            try {
+                mPlayController = new PlayController(this);
+                preparePlayer(musicList);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
+
         return mPlayController;
     }
 

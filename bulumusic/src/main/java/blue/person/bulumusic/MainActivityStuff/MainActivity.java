@@ -17,7 +17,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -54,6 +53,7 @@ public class MainActivity extends AppCompatActivity
     NavigationView navigationView;
     String listName;
     final int START_LIST_ACTIVITY = 21;
+    boolean pause = false;
 
     /**
      * 初始化后台组件
@@ -92,10 +92,18 @@ public class MainActivity extends AppCompatActivity
                 recyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
                 recyclerView.setItemAnimator(new DefaultItemAnimator());
                 recyclerView.addItemDecoration(new itemDecoration());
-                mPlayController = ((ShareDataApplication)getApplication()).getPlayController(mMusicList);
+                mPlayController = ((ShareDataApplication) getApplication()).getPlayController(mMusicList);
                 //TODO:刷新完的下一步
 
-                Music music = mMusicList.get(0);
+                if(mMusicList==null && mMusicList.size() == 0) {
+                    mLoadingDialog =
+                            new AlertDialog.Builder(MainActivity.this)
+                                    .setTitle("Loading")
+                                    .show();
+
+                    mDBController.scanMusic(this);
+
+                }Music music = mMusicList.get(0);
                 headerImage.setImageBitmap(music.getCover());
                 headerTitle.setText(music.getTitle());
                 headerAuthor.setText(music.getArtist());
@@ -103,10 +111,9 @@ public class MainActivity extends AppCompatActivity
                 mLoadingDialog.cancel();
 
 
-
             }
         };
-        mDBController = ((ShareDataApplication)getApplication()).getDBController();
+        mDBController = ((ShareDataApplication) getApplication()).getDBController();
         mLoadingDialog =
                 new AlertDialog.Builder(this)
                         .setTitle("Loading")
@@ -126,6 +133,7 @@ public class MainActivity extends AppCompatActivity
         toolbar.setTitle("Bulu Music");
         setSupportActionBar(toolbar);
 
+        setTitle("Bulu Music");
 
         //Floating Action Bar Stuff
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -154,7 +162,6 @@ public class MainActivity extends AppCompatActivity
         initialStuff();
 
 
-
     }
 
     @Override
@@ -174,27 +181,6 @@ public class MainActivity extends AppCompatActivity
         mBroadcastReceivers.unregisterAllBroadcastReceivers();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -208,10 +194,6 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, MusicListListActivity.class);
             intent.putExtra("mode", listAdapter.MODE_SELECT);
             startActivityForResult(intent, START_LIST_ACTIVITY);
-        } else if (id == R.id.nav_myFavourite) {
-
-        } else if (id == R.id.settings) {
-
         } else if (id == R.id.nav_exit) {
             exitConfirm();
         }
@@ -221,12 +203,31 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    static boolean confirm = false;
+
     private void exitConfirm() {
-        Snackbar.make(drawer, "你确定要退出吗", Snackbar.LENGTH_LONG)
+        Snackbar.make(drawer, "要停止播放嘛(不停止请再按一次退出)", Snackbar.LENGTH_LONG)
                 .setAction("确定", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (confirm) {
+                            MainActivity.this.finish();
+                            return;
+                        }
+                        mPlayController.stop();
                         MainActivity.this.finish();
+                        confirm = true;
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(3000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                confirm = false;
+                            }
+                        }).start();
                     }
                 }).show();
     }
@@ -306,9 +307,10 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == START_LIST_ACTIVITY) {
             if (data != null) {
                 String title = data.getStringExtra("title");
-                List<Music> list = mDBController.getMusicList(title);
+                mMusicList = mDBController.getMusicList(title);
                 listName = title;
-                mListAdapter.setMusicList(list, title);
+                mListAdapter.setMusicList(mMusicList, title);
+                // mMusicList = list;
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -318,12 +320,13 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public void run() {
-            headerStart.setImageResource(R.drawable.ic_menu_gallery);
+            headerStart.setImageResource(android.R.drawable.ic_media_pause);
             int index = mIntent.getIntExtra("Index", 0);
             Music music = mMusicList.get(index);
             headerTitle.setText(music.getTitle());
             headerAuthor.setText(music.getArtist());
             headerImage.setImageBitmap(music.getCover());
+            pause = false;
 
         }
     }
@@ -334,7 +337,13 @@ public class MainActivity extends AppCompatActivity
     private class onPauseListener extends BroadcastReceivers.BroadcastResolver {
         @Override
         public void run() {
-            headerStart.setImageResource(R.drawable.ic_menu_send);
+            if (!pause) {
+                headerStart.setImageResource(android.R.drawable.ic_media_play);
+                pause = true;
+            } else {
+                headerStart.setImageResource(android.R.drawable.ic_media_pause);
+                pause = false;
+            }
         }
     }
 
